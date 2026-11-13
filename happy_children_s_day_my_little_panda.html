@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy Children's Day, My Little Panda! 🐼🍭</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka (playful, rounded, childishly cute) & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+            handwriting: ['Caveat', 'cursive'],
+          },
+          colors: {
+            kiddo: {
+              sky: '#e0f2fe',
+              sun: '#fef08a',
+              candy: '#fbcfe8',
+              mint: '#bbf7d0',
+              coral: '#fb7185',
+              berry: '#ec4899',
+              grape: '#a855f7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #fef9c3 0%, #fce7f3 45%, #e0f2fe 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      transition: background 0.6s ease;
+    }
+
+    /* Dark/Night Mode (Cozy Bedtime Story Theme) */
+    body.night-mode {
+      background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #0f172a 100%);
+      color: #f8fafc;
+    }
+
+    /* Playful Glass Card */
+    .play-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 3px solid #ffffff;
+      box-shadow: 0 20px 35px -10px rgba(236, 72, 153, 0.18), 0 6px 0px rgba(251, 113, 133, 0.25);
+      transition: all 0.4s ease;
+    }
+
+    body.night-mode .play-card {
+      background: rgba(30, 27, 75, 0.85);
+      border-color: rgba(168, 85, 247, 0.4);
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5), 0 6px 0px rgba(168, 85, 247, 0.3);
+    }
+
+    /* Bouncy 3D Button */
+    .bouncy-btn {
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+      box-shadow: 0 5px 0px rgba(190, 24, 93, 0.4);
+    }
+    .bouncy-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0px rgba(190, 24, 93, 0.4);
+    }
+
+    /* Floating Toys & Candies */
+    .floating-toy {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatToy linear infinite;
+    }
+
+    @keyframes floatToy {
+      0% {
+        transform: translateY(105vh) rotate(-15deg) scale(0.85);
+        opacity: 0;
+      }
+      15% { opacity: 0.85; }
+      85% { opacity: 0.85; }
+      100% {
+        transform: translateY(-15vh) rotate(25deg) scale(1.1);
+        opacity: 0;
+      }
+    }
+
+    /* Wiggle animation */
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(4deg); }
+    }
+    .wiggle-anim {
+      animation: wiggle 2.2s ease-in-out infinite;
+    }
+
+    /* Balloon Pop Game */
+    .balloon {
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+      cursor: pointer;
+    }
+    .balloon:active {
+      transform: scale(1.3);
+    }
+    .balloon.popped {
+      transform: scale(1.6);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Coupon Ticket Perforation */
+    .coupon-notch {
+      background-image: radial-gradient(circle at 0 50%, transparent 10px, #fff1f2 11px),
+                        radial-gradient(circle at 100% 50%, transparent 10px, #fff1f2 11px);
+    }
+    body.night-mode .coupon-notch {
+      background-image: radial-gradient(circle at 0 50%, transparent 10px, #2e1065 11px),
+                        radial-gradient(circle at 100% 50%, transparent 10px, #2e1065 11px);
+    }
+  </style>
+</head>
+<body class="relative flex flex-col justify-between items-center antialiased min-h-screen">
+
+  <!-- Floating Background Toys & Candies -->
+  <div id="toy-bg" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+  <!-- Top Controls: Music & Bedtime Mode Toggle -->
+  <div class="fixed top-4 right-4 z-50 flex items-center gap-2">
+    <button id="musicBtn" aria-label="Toggle Playful Music" class="play-card flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-pink-600 dark:text-pink-300 active:scale-95 transition-all">
+      <span id="musicIcon" class="text-base">🎶</span>
+      <span id="musicLabel" class="hidden sm:inline">Play Tune</span>
+    </button>
+    <button id="themeBtn" aria-label="Toggle Bedtime Mode" class="play-card w-9 h-9 rounded-full flex items-center justify-center text-base active:scale-95 transition-all">
+      ☀️
+    </button>
+  </div>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-md mx-auto p-4 z-10 flex flex-col justify-center my-auto min-h-[92vh]">
+
+    <!-- ====================================================
+         PAGE 1: COVER PAGE (14TH NOVEMBER SPECIAL)
+    ===================================================== -->
+    <section id="page1" class="page-section flex flex-col items-center text-center">
+      <div class="play-card w-full rounded-[2rem] p-6 sm:p-8 relative overflow-hidden">
+        <!-- Cute Date Badge -->
+        <div class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 border border-amber-300 px-3.5 py-1 rounded-full text-xs font-bold tracking-wide mb-4">
+          <span>📅 14th November</span>
+          <span>•</span>
+          <span>Children's Day Special</span>
+        </div>
+
+        <!-- Wiggling Panda Mascot -->
+        <div class="w-28 h-28 mx-auto bg-gradient-to-tr from-pink-100 to-sky-100 rounded-full flex items-center justify-center border-4 border-white shadow-md mb-4 wiggle-anim">
+          <span class="text-6xl">🐼🍭</span>
+        </div>
+
+        <h1 class="font-fredoka text-3xl sm:text-4xl font-bold text-pink-600 dark:text-pink-400 leading-tight mb-2">
+          Happy Children's Day,<br/>My Little Panda!
+        </h1>
+
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6 font-medium">
+          To the girl who still has the purest heart, the cutest pout, and the brightest childlike smile in the whole world... today is all about celebrating <b>YOU</b>! 🎈✨
+        </p>
+
+        <button onclick="goToPage(2)" class="bouncy-btn w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-orange-400 text-white font-fredoka font-bold text-lg tracking-wide flex items-center justify-center gap-2">
+          <span>Unwrap Your Day!</span>
+          <span class="text-xl">🎁</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ====================================================
+         PAGE 2: WHY YOU'RE MY FAVORITE KIDDO (HEARTFELT NOTE)
+    ===================================================== -->
+    <section id="page2" class="page-section hidden flex-col items-center text-center">
+      <div class="play-card w-full rounded-[2rem] p-6 sm:p-8">
+        <div class="text-4xl mb-2">🧸💖</div>
+        <h2 class="font-fredoka text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-300 mb-3">
+          Never Lose Your Spark!
+        </h2>
+
+        <div class="bg-pink-50/80 dark:bg-purple-950/50 border-2 border-dashed border-pink-300 dark:border-purple-500/40 rounded-2xl p-4 sm:p-5 text-left space-y-3 mb-6">
+          <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+            My dearest Panda,
+          </p>
+          <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+            No matter how much we grow up, my favorite version of you is when you get excited over tiny things, make cute baby faces when you want snacks, and laugh like a carefree kid.
+          </p>
+          <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-200 leading-relaxed font-semibold text-pink-600 dark:text-pink-300">
+            Promise me you'll always keep that little kid alive inside you—and let me spoil her forever! 🥺🍭
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="goToPage(1)" class="py-3.5 px-4 rounded-2xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 font-bold text-xs hover:bg-gray-200 transition-all">
+            ← Back
+          </button>
+          <button onclick="goToPage(3)" class="bouncy-btn flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-fredoka font-bold text-base flex items-center justify-center gap-2">
+            <span>Play Mini Balloon Pop!</span>
+            <span>🎈</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ====================================================
+         PAGE 3: INTERACTIVE BALLOON POP MINI-GAME
+    ===================================================== -->
+    <section id="page3" class="page-section hidden flex-col items-center text-center">
+      <div class="play-card w-full rounded-[2rem] p-6 sm:p-8">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-300 bg-sky-100 dark:bg-sky-900/50 px-3 py-1 rounded-full">
+          Playtime Checkpoint
+        </span>
+        <h2 class="font-fredoka text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mt-2 mb-1">
+          Pop All 5 Balloons! 🎈
+        </h2>
+        <p class="text-xs text-gray-500 dark:text-gray-300 mb-5">
+          Tap each balloon to reveal sweet compliments hidden inside!
+        </p>
+
+        <!-- Compliment Reveal Banner -->
+        <div id="balloonMessage" class="min-h-[48px] flex items-center justify-center bg-amber-50 dark:bg-slate-800/90 border border-amber-200 dark:border-amber-500/30 rounded-xl px-3 py-2 mb-5 text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300 transition-all">
+          Tap a floating balloon below to pop it! 👇
+        </div>
+
+        <!-- 5 Interactive Balloons Grid -->
+        <div class="grid grid-cols-3 gap-3 max-w-[260px] mx-auto mb-6">
+          <button onclick="popBalloon(0, '100% Certified Cutie Pie 🥧')" id="b0" class="balloon flex flex-col items-center justify-center p-3 rounded-2xl bg-rose-100 border-2 border-rose-300 shadow-sm">
+            <span class="text-4xl">🎈</span>
+            <span class="text-[10px] font-bold text-rose-600 mt-1">Pop Me!</span>
+          </button>
+          <button onclick="popBalloon(1, 'Cutest Baby Pout Ever 🥺')" id="b1" class="balloon flex flex-col items-center justify-center p-3 rounded-2xl bg-sky-100 border-2 border-sky-300 shadow-sm">
+            <span class="text-4xl">🎈</span>
+            <span class="text-[10px] font-bold text-sky-600 mt-1">Pop Me!</span>
+          </button>
+          <button onclick="popBalloon(2, 'Infinite Momo & Chocolate Passes 🥟🍫')" id="b2" class="balloon flex flex-col items-center justify-center p-3 rounded-2xl bg-amber-100 border-2 border-amber-300 shadow-sm">
+            <span class="text-4xl">🎈</span>
+            <span class="text-[10px] font-bold text-amber-700 mt-1">Pop Me!</span>
+          </button>
+          <button onclick="popBalloon(3, 'My Forever Favorite Kiddo 🐼')" id="b3" class="balloon col-start-1 ml-6 flex flex-col items-center justify-center p-3 rounded-2xl bg-purple-100 border-2 border-purple-300 shadow-sm">
+            <span class="text-4xl">🎈</span>
+            <span class="text-[10px] font-bold text-purple-600 mt-1">Pop Me!</span>
+          </button>
+          <button onclick="popBalloon(4, 'Unlimited Forehead Kisses 😘')" id="b4" class="balloon col-start-2 ml-6 flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-100 border-2 border-emerald-300 shadow-sm">
+            <span class="text-4xl">🎈</span>
+            <span class="text-[10px] font-bold text-emerald-700 mt-1">Pop Me!</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-pink-100 dark:border-slate-700">
+          <button onclick="goToPage(2)" class="text-xs font-bold text-gray-400 hover:text-gray-600 py-2 px-2">
+            ← Back
+          </button>
+          <button id="nextFromBalloons" onclick="goToPage(4)" class="text-xs font-bold text-pink-600 dark:text-pink-300 bg-pink-100 dark:bg-pink-900/40 px-4 py-2 rounded-xl hover:bg-pink-200 transition-all">
+            Unlock Candy Box →
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ====================================================
+         PAGE 4: SWEET CANDY JAR / TOY BOX LOCK
+    ===================================================== -->
+    <section id="page4" class="page-section hidden flex-col items-center text-center">
+      <div class="play-card w-full rounded-[2rem] p-6 sm:p-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-pink-100 border-2 border-pink-300 flex items-center justify-center text-3xl mb-3 shadow-sm">
+          🍬🔐
+        </div>
+        <h2 class="font-fredoka text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-1">
+          Secret Candy Jar!
+        </h2>
+        <p class="text-xs text-gray-500 dark:text-gray-300 mb-4">
+          Enter Children's Day date (<span class="font-bold text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded">1411</span>) to open your special Children's Day Treat Pass!
+        </p>
+
+        <!-- 4-Digit Visual Dots -->
+        <div class="flex justify-center gap-3 bg-pink-50/80 dark:bg-slate-800 border-2 border-pink-200 dark:border-purple-500/40 rounded-2xl py-3.5 px-4 mb-2">
+          <span id="cDot0" class="w-4 h-4 rounded-full border-2 border-pink-400 transition-all"></span>
+          <span id="cDot1" class="w-4 h-4 rounded-full border-2 border-pink-400 transition-all"></span>
+          <span id="cDot2" class="w-4 h-4 rounded-full border-2 border-pink-400 transition-all"></span>
+          <span id="cDot3" class="w-4 h-4 rounded-full border-2 border-pink-400 transition-all"></span>
+        </div>
+        <p id="candyError" class="text-xs font-bold text-rose-500 h-4 mb-3 opacity-0 transition-opacity">
+          Oops! Hint: 14th November = 1411 🍭
+        </p>
+
+        <!-- Cute Round Keypad -->
+        <div class="grid grid-cols-3 gap-2.5 max-w-[250px] mx-auto mb-5">
+          <button onclick="tapCandyKey('1')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">1</button>
+          <button onclick="tapCandyKey('2')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">2</button>
+          <button onclick="tapCandyKey('3')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">3</button>
+          <button onclick="tapCandyKey('4')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">4</button>
+          <button onclick="tapCandyKey('5')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">5</button>
+          <button onclick="tapCandyKey('6')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">6</button>
+          <button onclick="tapCandyKey('7')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">7</button>
+          <button onclick="tapCandyKey('8')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">8</button>
+          <button onclick="tapCandyKey('9')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">9</button>
+          <button onclick="tapCandyKey('C')" class="bg-rose-100 dark:bg-rose-900/50 rounded-2xl py-3 font-fredoka font-bold text-xs text-rose-600 dark:text-rose-300 shadow active:scale-90 transition-transform">CLEAR</button>
+          <button onclick="tapCandyKey('0')" class="bg-white dark:bg-slate-800 rounded-2xl py-3 font-fredoka font-bold text-lg text-gray-700 dark:text-white shadow border border-pink-100 dark:border-slate-700 active:scale-90 transition-transform">0</button>
+          <button onclick="autoUnlockCandy()" class="bg-amber-100 dark:bg-amber-900/50 rounded-2xl py-3 font-fredoka font-bold text-xs text-amber-700 dark:text-amber-300 shadow active:scale-90 transition-transform">HINT 💡</button>
+        </div>
+
+        <button onclick="goToPage(3)" class="text-xs font-bold text-gray-400 hover:text-gray-600">
+          ← Back to Balloons
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ====================================================
+         PAGE 5: GRAND REVEAL - GOLDEN CHILDREN'S DAY VOUCHER
+    ===================================================== -->
+    <section id="page5" class="page-section hidden flex-col items-center text-center">
+      <div class="play-card w-full rounded-[2rem] overflow-hidden border-4 border-amber-300 shadow-2xl">
+        
+        <!-- Top Celebration Header -->
+        <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-amber-400 p-6 text-white">
+          <div class="text-4xl mb-1">🐼👑🍭</div>
+          <h2 class="font-fredoka text-2xl sm:text-3xl font-bold tracking-wide">
+            Official Kiddo VIP Pass!
+          </h2>
+          <p class="text-xs uppercase tracking-widest text-amber-100 font-bold mt-1">
+            Valid on 14th November & Forever
+          </p>
+        </div>
+
+        <!-- Voucher Body -->
+        <div class="p-6 bg-rose-50/40 dark:bg-slate-900/60 coupon-notch">
+          <p class="font-handwriting text-2xl text-pink-600 dark:text-pink-300 mb-2">
+            Happy Children's Day, My Baby Panda! 💖
+          </p>
+          <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed">
+            Because you are officially my favorite little kid, this golden pass entitles you to <b>any treat you want</b> today! Pick your favorite reward below:
+          </p>
+
+          <!-- Interactive Treat Selector -->
+          <div class="space-y-2.5 text-left mb-6">
+            <label onclick="selectTreat('Hot Momos & Chocolates Date 🥟🍫')" class="treat-option flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-pink-200 dark:border-purple-500/40 cursor-pointer hover:border-pink-500 transition-all">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🥟</span>
+                <div>
+                  <div class="text-xs sm:text-sm font-bold text-gray-800 dark:text-white">Hot Momos & Chocolates</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Unlimited steamed momos & sweet chocolates</div>
+                </div>
+              </div>
+              <input type="radio" name="treat" checked class="w-4 h-4 accent-pink-500">
+            </label>
+
+            <label onclick="selectTreat('Extra Spicy Momo Platter & Dark Chocolate Feast 🥟🍫✨')" class="treat-option flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-pink-200 dark:border-purple-500/40 cursor-pointer hover:border-pink-500 transition-all">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🍫</span>
+                <div>
+                  <div class="text-xs sm:text-sm font-bold text-gray-800 dark:text-white">Mega Momo & Chocolate Feast</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Whatever your tummy craves right now</div>
+                </div>
+              </div>
+              <input type="radio" name="treat" class="w-4 h-4 accent-pink-500">
+            </label>
+
+            <label onclick="selectTreat('Long Drive, Cuddles & Extra Pampering 🧸🚗')" class="treat-option flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-pink-200 dark:border-purple-500/40 cursor-pointer hover:border-pink-500 transition-all">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🧸</span>
+                <div>
+                  <div class="text-xs sm:text-sm font-bold text-gray-800 dark:text-white">Full Day Pampering</div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400">Zero tantrums denied, 100% baby treatment</div>
+                </div>
+              </div>
+              <input type="radio" name="treat" class="w-4 h-4 accent-pink-500">
+            </label>
+          </div>
+
+          <!-- Claim on WhatsApp Button -->
+          <a id="claimWhatsappBtn" href="#" target="_blank" class="bouncy-btn w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-fredoka font-bold text-base flex items-center justify-center gap-2 shadow-lg">
+            <span>Claim My Treat on WhatsApp!</span>
+            <span>💬💖</span>
+          </a>
+
+          <!-- Special Kinder Joy Surprise Egg & Delivery Tracker Card -->
+          <div class="mt-5 p-4 rounded-2xl bg-gradient-to-br from-sky-50 via-white to-rose-50 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/60 border-2 border-sky-200 dark:border-sky-500/40 shadow-inner text-center">
+            <div class="inline-flex items-center gap-1.5 bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 px-3 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider mb-2">
+              <span>🛵 Bonus Express Delivery</span>
+            </div>
+
+            <h3 class="font-fredoka text-lg font-bold text-gray-800 dark:text-white">
+              Special Kinder Joy Dispatch! 🥚✨
+            </h3>
+            <p class="text-[11px] text-gray-500 dark:text-gray-300 mb-3">
+              Tap the Kinder Joy egg below to crack it open & check your live delivery status!
+            </p>
+
+            <!-- Interactive Crackable Kinder Joy Egg -->
+            <button id="kinderEggBtn" onclick="crackKinderJoy()" class="mx-auto w-24 h-28 rounded-[50%_50%_45%_45%/60%_60%_40%_40%] bg-gradient-to-b from-white via-rose-50 to-orange-500 border-4 border-white shadow-lg flex flex-col items-center justify-center active:scale-90 transition-all cursor-pointer relative overflow-hidden">
+              <span id="kinderEggIcon" class="text-3xl drop-shadow">🥚</span>
+              <span id="kinderEggLabel" class="text-[9px] font-extrabold uppercase tracking-wider text-white bg-rose-600/90 px-2 py-0.5 rounded-full mt-1">Tap to Open</span>
+            </button>
+
+            <!-- Hidden Kinder Joy Surprise + Delivery Tracker (Revealed on tap) -->
+            <div id="kinderRevealBox" class="hidden mt-3 pt-3 border-t border-dashed border-sky-200 dark:border-slate-700 text-left space-y-2">
+              <div class="flex items-center justify-between bg-white dark:bg-slate-900/80 p-2.5 rounded-xl border border-sky-100 dark:border-slate-700">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🍫🧸</span>
+                  <div>
+                    <div class="text-xs font-bold text-gray-800 dark:text-white">2 Crispy Wafer Balls + Panda Toy!</div>
+                    <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">● Out for Hand-Delivery by Your Boyfriend</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">ETA: SOON</span>
+              </div>
+
+              <button onclick="trackKinderDelivery()" class="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-fredoka font-bold text-xs shadow transition-all flex items-center justify-center gap-1.5">
+                <span>📍 Track Live Kinder Joy Delivery</span>
+              </button>
+            </div>
+          </div>
+
+          <button onclick="shootConfetti()" class="mt-3 text-xs font-bold text-pink-500 hover:underline">
+            🎉 Tap for More Confetti!
+          </button>
+        </div>
+      </div>
+
+      <button onclick="goToPage(1)" class="mt-4 text-xs font-bold text-gray-500 dark:text-gray-300 hover:text-pink-600 pb-4">
+        🔄 Play Again From Start
+      </button>
+    </section>
+
+  </main>
+
+  <!-- Live Delivery Tracking Modal -->
+  <div id="deliveryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+    <div class="play-card w-full max-w-sm rounded-3xl p-6 text-center relative animate-bounce-once">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl mb-2">
+        🛵💨
+      </div>
+      <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full">
+        Tracking ID: #KINDER-PANDA-1411
+      </span>
+      <h3 class="font-fredoka text-xl font-bold text-gray-800 dark:text-white mt-2 mb-3">
+        Kinder Joy Express Status
+      </h3>
+
+      <!-- Step-by-step Tracker -->
+      <div class="text-left space-y-2.5 bg-sky-50/70 dark:bg-slate-800/90 p-3.5 rounded-2xl border border-sky-100 dark:border-slate-700 mb-4 text-xs">
+        <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-bold">
+          <span>✅</span>
+          <span>Order Placed with Extra Love</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400 font-bold">
+          <span>✅</span>
+          <span>Packed with 100% Sweetness & Toy Inside</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-pink-600 dark:text-pink-400 font-bold">
+          <span>🛵</span>
+          <span>Delivery Partner (Me!) En Route to Panda</span>
+        </div>
+      </div>
+
+      <a id="kinderWhatsappBtn" href="#" target="_blank" class="bouncy-btn w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-fredoka font-bold text-sm flex items-center justify-center gap-2 mb-2">
+        <span>Ping Delivery Guy for Kinder Joy! 🥚💬</span>
+      </a>
+      <button onclick="closeDeliveryModal()" class="text-xs font-bold text-gray-400 hover:text-gray-600 py-1">
+        Close Tracker
+      </button>
+    </div>
+  </div>
+
+  <!-- Cute Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4">
+    <div class="bg-gray-900/90 text-white text-xs sm:text-sm font-bold py-2.5 px-5 rounded-full shadow-xl flex items-center gap-2 border border-pink-400/40">
+      <span id="toastEmoji">✨</span>
+      <span id="toastText">Message</span>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. PAGE NAVIGATION & CONFETTI
+       ========================================================================== */
+    let selectedTreat = "Hot Momos & Chocolates Date 🥟🍫";
+
+    function goToPage(pageNum) {
+      playPopSound(520, 0.12);
+      document.querySelectorAll('.page-section').forEach(sec => {
+        sec.classList.add('hidden');
+        sec.classList.remove('flex');
+      });
+
+      const target = document.getElementById(`page${pageNum}`);
+      if (target) {
+        target.classList.remove('hidden');
+        target.classList.add('flex');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (pageNum === 5) {
+        shootConfetti();
+        updateWhatsAppClaimLink();
+      }
+    }
+
+    function shootConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 85,
+          spread: 75,
+          origin: { y: 0.6 },
+          colors: ['#ec4899', '#facc15', '#38bdf8', '#a855f7', '#fb7185']
+        });
+      }
+    }
+
+    /* ==========================================================================
+       2. BALLOON POP MINI-GAME LOGIC
+       ========================================================================== */
+    let poppedCount = 0;
+
+    function popBalloon(index, compliment) {
+      const btn = document.getElementById(`b${index}`);
+      if (!btn || btn.classList.contains('popped')) return;
+
+      btn.classList.add('popped');
+      poppedCount++;
+
+      // Play cheerful ascending pop tone
+      playPopSound(480 + poppedCount * 95, 0.16, 'triangle');
+
+      const banner = document.getElementById('balloonMessage');
+      banner.innerText = compliment;
+      banner.classList.add('scale-105');
+      setTimeout(() => banner.classList.remove('scale-105'), 200);
+
+      if (poppedCount === 5) {
+        shootConfetti();
+        showToast("All 5 balloons popped! You're amazing! 🎉", "🎈");
+        const nextBtn = document.getElementById('nextFromBalloons');
+        nextBtn.classList.remove('bg-pink-100', 'text-pink-600');
+        nextBtn.classList.add('bg-gradient-to-r', 'from-pink-500', 'to-rose-500', 'text-white', 'shadow-md');
+      }
+    }
+
+    /* ==========================================================================
+       3. CANDY JAR PASSCODE LOCK (1411 = 14th November)
+       ========================================================================== */
+    let candyCode = "";
+    const SECRET_DATE = "1411";
+
+    function tapCandyKey(digit) {
+      if (digit === 'C') {
+        candyCode = "";
+        playPopSound(300, 0.08);
+      } else if (candyCode.length < 4) {
+        candyCode += digit;
+        playPopSound(440 + candyCode.length * 80, 0.1);
+      }
+      renderCandyDots();
+
+      if (candyCode.length === 4) {
+        setTimeout(checkCandyCode, 220);
+      }
+    }
+
+    function renderCandyDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`cDot${i}`);
+        if (i < candyCode.length) {
+          dot.classList.add('bg-pink-500', 'scale-125');
+        } else {
+          dot.classList.remove('bg-pink-500', 'scale-125');
+        }
+      }
+      document.getElementById('candyError').classList.add('opacity-0');
+    }
+
+    function checkCandyCode() {
+      if (candyCode === SECRET_DATE) {
+        playSuccessFanfare();
+        showToast("Candy Jar Unlocked! Happy Children's Day! 🍬", "🔓");
+        setTimeout(() => goToPage(5), 650);
+      } else {
+        playPopSound(180, 0.28, 'sawtooth');
+        document.getElementById('candyError').classList.remove('opacity-0');
+        candyCode = "";
+        renderCandyDots();
+      }
+    }
+
+    function autoUnlockCandy() {
+      candyCode = "1411";
+      renderCandyDots();
+      setTimeout(checkCandyCode, 250);
+    }
+
+    /* ==========================================================================
+       4. TREAT SELECTION & WHATSAPP LINK
+       ========================================================================== */
+    function selectTreat(treatName) {
+      selectedTreat = treatName;
+      playPopSound(660, 0.1);
+      updateWhatsAppClaimLink();
+      showToast("Yummy choice selected! 😋", "🎁");
+    }
+
+    function updateWhatsAppClaimLink() {
+      const text = encodeURIComponent(
+        `Happy Children's Day! 🐼🍭 I unlocked my VIP Kiddo Pass and I'm claiming my treat: *${selectedTreat}* + my special *Kinder Joy* delivery! 🥚🍫💖`
+      );
+      document.getElementById('claimWhatsappBtn').href = `https://wa.me/?text=${text}`;
+
+      const kinderText = encodeURIComponent(
+        `Hey Delivery Partner! 🛵🐼 Tracking #KINDER-PANDA-1411 says my Kinder Joy is on the way! Where is my Kinder Joy?! 🥚🍫✨`
+      );
+      const kinderBtn = document.getElementById('kinderWhatsappBtn');
+      if (kinderBtn) kinderBtn.href = `https://wa.me/?text=${kinderText}`;
+    }
+
+    let kinderCracked = false;
+    function crackKinderJoy() {
+      playSuccessFanfare();
+      shootConfetti();
+
+      const eggBtn = document.getElementById('kinderEggBtn');
+      const eggIcon = document.getElementById('kinderEggIcon');
+      const eggLabel = document.getElementById('kinderEggLabel');
+      const revealBox = document.getElementById('kinderRevealBox');
+
+      eggIcon.innerText = "🎁🍫";
+      eggLabel.innerText = "Unlocked!";
+      eggLabel.classList.replace('bg-rose-600/90', 'bg-emerald-600');
+      eggBtn.classList.add('scale-105');
+
+      revealBox.classList.remove('hidden');
+      if (!kinderCracked) {
+        showToast("Yay! You cracked open a Kinder Joy! 🥚✨", "🍫");
+        kinderCracked = true;
+      }
+    }
+
+    function trackKinderDelivery() {
+      playPopSound(680, 0.14);
+      updateWhatsAppClaimLink();
+      const modal = document.getElementById('deliveryModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDeliveryModal() {
+      const modal = document.getElementById('deliveryModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    /* ==========================================================================
+       5. PLAYFUL WEB AUDIO MUSIC BOX SYNTHESIZER
+       ========================================================================== */
+    let audioCtx = null;
+    let isMusicOn = false;
+    let musicLoop = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playPopSound(freq, duration = 0.14, type = 'sine') {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSuccessFanfare() {
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((n, idx) => {
+        setTimeout(() => playPopSound(n, 0.3, 'triangle'), idx * 95);
+      });
+    }
+
+    // Twinkle Twinkle Little Star / Music Box Lullaby Notes
+    const lullabyNotes = [
+      { f: 523.25, d: 0.35 }, { f: 523.25, d: 0.35 }, { f: 783.99, d: 0.35 }, { f: 783.99, d: 0.35 },
+      { f: 880.00, d: 0.35 }, { f: 880.00, d: 0.35 }, { f: 783.99, d: 0.7 },
+      { f: 698.46, d: 0.35 }, { f: 698.46, d: 0.35 }, { f: 659.25, d: 0.35 }, { f: 659.25, d: 0.35 },
+      { f: 587.33, d: 0.35 }, { f: 587.33, d: 0.35 }, { f: 523.25, d: 0.7 }
+    ];
+    let stepIdx = 0;
+
+    function runMusicBox() {
+      if (!isMusicOn) return;
+      const note = lullabyNotes[stepIdx];
+      playPopSound(note.f, note.d, 'sine');
+      stepIdx = (stepIdx + 1) % lullabyNotes.length;
+      musicLoop = setTimeout(runMusicBox, (note.d + 0.12) * 1000);
+    }
+
+    document.getElementById('musicBtn').addEventListener('click', () => {
+      initAudio();
+      isMusicOn = !isMusicOn;
+      const icon = document.getElementById('musicIcon');
+      const label = document.getElementById('musicLabel');
+      if (isMusicOn) {
+        icon.innerText = "🔊";
+        label.innerText = "Music On";
+        runMusicBox();
+        showToast("Playing sweet music box tune 🎵", "🧸");
+      } else {
+        icon.innerText = "🎶";
+        label.innerText = "Play Tune";
+        clearTimeout(musicLoop);
+      }
+    });
+
+    /* ==========================================================================
+       6. BEDTIME / NIGHT MODE TOGGLE & FLOATING TOYS
+       ========================================================================== */
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('night-mode');
+      const isNight = document.body.classList.contains('night-mode');
+      themeBtn.innerText = isNight ? "🌙" : "☀️";
+      playPopSound(isNight ? 392 : 587, 0.12);
+    });
+
+    function spawnFloatingToys() {
+      const container = document.getElementById('toy-bg');
+      const toys = ['🐼', '🍭', '🎈', '🧸', '🥟', '🍫', '✨', '💖', '🍬', '🌈'];
+      for (let i = 0; i < 16; i++) {
+        const el = document.createElement('span');
+        el.className = 'floating-toy text-xl sm:text-2xl';
+        el.innerText = toys[Math.floor(Math.random() * toys.length)];
+        el.style.left = `${Math.random() * 94}vw`;
+        el.style.animationDuration = `${8 + Math.random() * 7}s`;
+        el.style.animationDelay = `${Math.random() * 6}s`;
+        container.appendChild(el);
+      }
+    }
+
+    let toastTimer = null;
+    function showToast(msg, emoji = "✨") {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      const toastEmoji = document.getElementById('toastEmoji');
+      if (!toast || !toastText || !toastEmoji) return;
+
+      toastText.innerText = msg;
+      toastEmoji.innerText = emoji;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      spawnFloatingToys();
+      updateWhatsAppClaimLink();
+    });
+  </script>
+</body>
+</html>
